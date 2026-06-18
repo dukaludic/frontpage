@@ -18,12 +18,14 @@ model User {
 }
 
 model Feed {
-  id         String     @id @default(uuid())
-  url        String     @unique
-  name       String
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  feed_items FeedItem[]
+  id              String     @id @default(uuid())
+  url             String     @unique
+  title           String
+  health_status   String
+  last_fetched_at DateTime
+  created_at      DateTime   @default(now())
+  updated_at      DateTime   @updatedAt
+  feed_items      FeedItem[]
 
   @@map("feeds")
 }
@@ -32,7 +34,6 @@ model FeedItem {
   id           String   @id @default(uuid())
   feed_id      String
   feed         Feed     @relation(fields: [feed_id], references: [id])
-  url          String
   title        String
   description  String
   published_at DateTime
