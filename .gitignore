@@ -41,5 +41,10 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# docs
 25-day-mvp-plan.md
 mvp-decisions.md
+
+# sample feeds
+/samples
