@@ -1,7 +1,6 @@
-import { prisma } from "../db";
-import { FeedHealthStatus } from "./types";
+import { FetchResult } from "./types";
 
-export async function fetchFeed(url: string): Promise<string | null> {
+export async function fetchFeed(url: string): Promise<FetchResult> {
     const controller = new AbortController();
     const timeout = setTimeout(() => {
         controller.abort();
@@ -17,37 +16,28 @@ export async function fetchFeed(url: string): Promise<string | null> {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            return {
+                ok: false,
+                kind: "http",
+                status: response.status,
+                message: `HTTP error! status: ${response.status}`,
+            };
         }
 
-        const text = await response.text();
-
-        return text;
+        const body = await response.text();
+        return { ok: true, body };
     } catch (error) {
-        console.error(error);
-
-        if (error instanceof Error && error.message.includes('404')) {
-            await prisma.feed.update({
-                where: { url: url },
-                data: {
-                    last_fetched_at: new Date(),
-                    health_status: FeedHealthStatus.Unreachable,
-                    last_error: error.message,
-                },
-            });
-            return null;
+        if (error instanceof Error && error.name === "AbortError") {
+            return {
+                ok: false,
+                kind: "timeout",
+                message: "Request timed out after 10s",
+            };
         }
 
-        if (error instanceof Error && error.message.includes('HTML')) {
-            await prisma.feed.update({
-                where: { url: url },
-                data: {
-                    health_status: "Invalid",
-                },
-            });
-            return null;
-        }
-        return null;
+        const message =
+            error instanceof Error ? error.message : "Network request failed";
+        return { ok: false, kind: "network", message };
     } finally {
         clearTimeout(timeout);
     }

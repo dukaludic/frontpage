@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { parseFeed } from "./parser";
 import { fetchFeed } from "./fetch";
+import { FeedHealthStatus } from "./types";
 
 //TODO: Optimize with raw SQL when the load gets too high
 export async function refreshFeed(feedId: string) {
@@ -12,16 +13,22 @@ export async function refreshFeed(feedId: string) {
         throw new Error("Feed not found");
     }
 
-    const feedText = await fetchFeed(feed.url);
+    const fetched = await fetchFeed(feed.url);
 
-    if (!feedText) {
-        throw new Error("Failed to fetch feed");
+    if (!fetched.ok) {
+        await updateFeedHealth(feedId, FeedHealthStatus.Unreachable, fetched.message);
+        return;
     }
 
-    const feedData = await parseFeed(feedText);
+    const feedData = await parseFeed(fetched.body);
 
     if (!feedData) {
-        throw new Error("Failed to parse feed");
+        await updateFeedHealth(
+            feedId,
+            FeedHealthStatus.Invalid,
+            "Failed to parse feed",
+        );
+        return;
     }
 
     for (const item of feedData.items) {
@@ -45,11 +52,33 @@ export async function refreshFeed(feedId: string) {
             },
         });
     }
+
+    await updateFeedHealth(
+        feedId,
+        FeedHealthStatus.Healthy,
+        null,
+        feedData.feed.title,
+    );
 }
 
 export async function refreshAllFeeds() {
     const feeds = await prisma.feed.findMany();
-    for (const feed of feeds) {
-        await refreshFeed(feed.id);
-    }
+    await Promise.allSettled(feeds.map((feed) => refreshFeed(feed.id)));
+}
+
+async function updateFeedHealth(
+    feedId: string,
+    healthStatus: FeedHealthStatus,
+    lastError: string | null,
+    title?: string,
+) {
+    await prisma.feed.update({
+        where: { id: feedId },
+        data: {
+            last_fetched_at: new Date(),
+            health_status: healthStatus,
+            last_error: lastError,
+            ...(title != null && { title }),
+        },
+    });
 }

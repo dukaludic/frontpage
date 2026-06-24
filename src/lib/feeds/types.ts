@@ -19,6 +19,12 @@ export enum FeedHealthStatus {
     Invalid = "Invalid",
 }
 
+export type FetchResult =
+    | { ok: true; body: string }
+    | { ok: false; kind: "http"; status: number; message: string }
+    | { ok: false; kind: "timeout"; message: string }
+    | { ok: false; kind: "network"; message: string };
+
 export interface RSS2Feed {
     rss: {
         channel: {
