@@ -9,6 +9,7 @@ export async function fetchFeed(url: string): Promise<FetchResult> {
     try {
         const response = await fetch(url, {
             signal: controller.signal,
+            method: "GET",
             headers: {
                 "User-Agent": "Frontpage/0.1 (+https://not-made-yet.com; dev build)",
                 "Accept": "application/rss+xml, application/xml;q=0.9, */*;q=0.8",

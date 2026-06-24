@@ -1,7 +1,6 @@
 import { ParsedFeed, RSS2Feed, RSS2FeedItem, RSS1Feed, RSS1FeedItem, AtomFeed, AtomEntry } from "./types";
 import { XMLParser } from "fast-xml-parser";
 import util from "util";
-import { prisma } from "../db";
 
 export async function parseFeed(feed: string): Promise<ParsedFeed | null> {
 
@@ -94,9 +93,6 @@ function normalizeRSS1Feed(feed: RSS1Feed): ParsedFeed | null {
 }
 
 function normalizeAtomFeed(feed: AtomFeed): ParsedFeed | null {
-
-    console.log(util.inspect(feed, { depth: null }));
-
     const feedUrl = Array.isArray(feed.feed.link) ? feed.feed.link[0] : feed.feed.link;
     const feedEntries = Array.isArray(feed.feed.entry) ? feed.feed.entry : [feed.feed.entry];
 
