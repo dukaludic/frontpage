@@ -20,9 +20,10 @@ model User {
 model Feed {
   id              String     @id @default(uuid())
   url             String     @unique
-  title           String
-  health_status   String
-  last_fetched_at DateTime
+  title           String?
+  health_status   String?
+  last_fetched_at DateTime?
+  last_error      String?
   created_at      DateTime   @default(now())
   updated_at      DateTime   @updatedAt
   feed_items      FeedItem[]
@@ -34,11 +35,13 @@ model FeedItem {
   id           String   @id @default(uuid())
   feed_id      String
   feed         Feed     @relation(fields: [feed_id], references: [id])
-  title        String
-  description  String
+  title        String?
+  url          String
+  description  String?
   published_at DateTime
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
 
+  @@unique([feed_id, url])
   @@map("feed_items")
 }

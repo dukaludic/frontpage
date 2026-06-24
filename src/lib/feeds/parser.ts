@@ -1,6 +1,7 @@
 import { ParsedFeed, RSS2Feed, RSS2FeedItem, RSS1Feed, RSS1FeedItem, AtomFeed, AtomEntry } from "./types";
 import { XMLParser } from "fast-xml-parser";
 import util from "util";
+import { prisma } from "../db";
 
 export async function parseFeed(feed: string): Promise<ParsedFeed | null> {
 
@@ -28,6 +29,7 @@ export async function parseFeed(feed: string): Promise<ParsedFeed | null> {
     } catch (error) {
         if (error instanceof Error && error.message.includes('404')) {
             console.error(error);
+
             return null;
         }
 
@@ -72,17 +74,18 @@ function normalizeRSS2Feed(feed: RSS2Feed): ParsedFeed | null {
 
 function normalizeRSS1Feed(feed: RSS1Feed): ParsedFeed | null {
     const items = Array.isArray(feed["rdf:RDF"].item) ? feed["rdf:RDF"].item ?? [] : [feed["rdf:RDF"].item];
+    const filteredItems = items.filter((item: RSS1FeedItem) => item.link);
 
     return {
         feed: {
             title: feed["rdf:RDF"].channel.title,
             url: feed["rdf:RDF"].channel.link,
         },
-        items: items.map((item: RSS1FeedItem) => {
+        items: filteredItems.map((item: RSS1FeedItem) => {
             const publishedAt = item['dc:date'] ? new Date(item['dc:date']) : new Date();
             return {
                 title: item.title,
-                url: item.link,
+                url: item.link!,
                 description: item.description,
                 published_at: publishedAt,
             }
