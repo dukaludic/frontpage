@@ -15,8 +15,11 @@ model User {
   image         String?
   password      String?
 
-  accounts Account[]
-  sessions Session[]
+  accounts  Account[]
+  sessions  Session[]
+  userFeeds UserFeed[]
+
+  @@map("users")
 }
 
 model Account {
@@ -35,6 +38,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
@@ -45,6 +49,7 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([sessionToken])
+  @@map("sessions")
 }
 
 model VerificationToken {
@@ -53,6 +58,7 @@ model VerificationToken {
   expires    DateTime
 
   @@id([identifier, token])
+  @@map("verification_tokens")
 }
 
 model Feed {
@@ -65,6 +71,7 @@ model Feed {
   created_at      DateTime   @default(now())
   updated_at      DateTime   @updatedAt
   feed_items      FeedItem[]
+  userFeeds       UserFeed[]
 
   @@map("feeds")
 }
@@ -82,4 +89,28 @@ model FeedItem {
 
   @@unique([feed_id, url])
   @@map("feed_items")
+}
+
+model UserFeed {
+  userId String
+  feedId String
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  customTitle String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  feed Feed @relation(fields: [feedId], references: [id], onDelete: Restrict)
+
+  @@id([userId, feedId])
+  @@map("users_feeds")
+}
+
+model Category {
+  id        String     @id @default(uuid())
+  name      String
+  userFeeds UserFeed[]
+
+  @@map("categories")
 }
