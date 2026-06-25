@@ -1,7 +1,7 @@
 "use server";
 
 import { AuthError } from "@/lib/auth/errors";
-import { signIn } from "./auth";
+import { signIn, signOut as authSignOut } from "./auth";
 import { prisma } from "@/lib/db";
 import {
     type AuthActionState,
@@ -86,4 +86,8 @@ export async function registerWithCredentials(
     }
 
     return null;
+}
+
+export async function signOut() {
+    await authSignOut({ redirectTo: "/" });
 }

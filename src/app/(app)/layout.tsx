@@ -1,3 +1,5 @@
+import { SignOutButton } from "@/components/auth/sign-out-button";
+
 export default function AppLayout({
   children,
 }: {
@@ -6,7 +8,9 @@ export default function AppLayout({
   return (
     <div>
       <aside>Sidebar (Day 4)</aside>
-      <main>{children}</main>
+      <main>{children}
+        <SignOutButton />
+      </main>
     </div>
   );
 }

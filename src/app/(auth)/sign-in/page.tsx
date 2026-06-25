@@ -1,5 +1,5 @@
 import CredentialsSignInForm from "@/components/auth/credentials-sign-in-form";
-import GithubAuthButton from "@/components/auth/login-button";
+import GithubAuthButton from "@/components/auth/github-sign-in-button";
 import Link from "next/link";
 
 export default function SignInPage() {
