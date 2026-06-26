@@ -10,9 +10,10 @@ export default function CredentialsSignInForm() {
     );
 
     return (
-        <form action={formAction}>
-            {state?.error && <p role="alert">{state.error}</p>}
-            <div>
+        <form className="flex flex-col gap-2" action={formAction}>
+            {state?.error && <p role="alert" className="text-red-500">{state.error}</p>}
+
+            <div className="flex flex-col gap-2 items-center">
                 <label htmlFor="sign-in-email">Email</label>
                 <input
                     id="sign-in-email"
@@ -22,7 +23,7 @@ export default function CredentialsSignInForm() {
                     required
                 />
             </div>
-            <div>
+            <div className="flex flex-col gap-2 items-center">
                 <label htmlFor="sign-in-password">Password</label>
                 <input
                     id="sign-in-password"
@@ -32,9 +33,11 @@ export default function CredentialsSignInForm() {
                     required
                 />
             </div>
-            <button type="submit" disabled={pending}>
-                {pending ? "Signing in…" : "Sign in with email"}
-            </button>
+            <div className="flex justify-center">
+                <button type="submit" disabled={pending} className="text-center cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-md">
+                    {pending ? "Signing in…" : "Sign in with email"}
+                </button>
+            </div>
         </form>
     );
 }

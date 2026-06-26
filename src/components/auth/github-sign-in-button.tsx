@@ -9,7 +9,7 @@ export default function GithubAuthButton({
 }: GithubAuthButtonProps) {
     return (
         <form action={signInWithGithub}>
-            <button type="submit">{label}</button>
+            <button type="submit" className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-md">{label}</button>
         </form>
     );
 }

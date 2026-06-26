@@ -4,13 +4,12 @@ import Link from "next/link";
 
 export default function SignUpPage() {
     return (
-        <div>
-            <h1>Sign up</h1>
+        <div className="flex flex-col gap-2 items-center p-4 border border-gray-200 rounded-md max-w-md mx-auto mt-4">
+            <h1 className="text-2xl font-bold text-center">Sign up</h1>
             <CredentialsSignUpForm />
             <p>or</p>
-            <GithubAuthButton label="Sign up with GitHub" />
+            <GithubAuthButton />
             <br />
-            <Link href="/sign-in">Sign in</Link>
         </div>
     );
 }
